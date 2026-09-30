@@ -31,17 +31,33 @@ enum Genre{
   }
 }
 
-class Book {
+abstract class LibraryItem{
   final String title;
   final int year;
+  
+  const LibraryItem({
+    required this.title,
+    required this.year,
+  });
+
+  String describe();
+
+  bool get isOld => year < 2000;
+}
+
+mixin Borrowable on LibraryItem {
+  String borrowLabel() => 'Borrow: $title';
+}
+
+class Book extends LibraryItem with Borrowable{
   final int pages;
   final Author author;
   final Genre genre;
   final String? description;
 
   const Book({
-    required this.title,
-    required this.year,
+    required super.title,
+    required super.year,
     required this.pages,
     required this.author,
     required this.genre,
@@ -87,7 +103,40 @@ String toString() {
       'by ${author.name}, ${genre.label}';
 }
 
+@override
+String describe() => '$title by ${author.name}';
 }
+
+
+class Magazine extends LibraryItem {
+  final int issue;
+
+  const Magazine({
+    required super.title,
+    required super.year,
+    required this.issue,
+  });
+
+  @override
+  String describe() => '$title, issue $issue';
+}
+
+class Ghost implements LibraryItem {
+  @override
+  final String title;
+
+  @override
+  final int year;
+
+  Ghost(this.title, this.year);
+
+  @override
+  String describe() => '$title ($year)';
+
+  @override
+  bool get isOld => year < 2000;
+}
+
 
 const book = Book(
     title: 'Clean code',
